@@ -4,90 +4,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toe</title>
+    <title>Wack A Mole</title>
 
     <style>
         body {
             margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #4e73df, #1cc88a);
+            font-family: "Poppins", sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            width: 360px;
         }
 
         h1 {
-            color: white;
-            margin-bottom: 20px;
-            letter-spacing: 2px;
+            margin-bottom: 15px;
+            color: #2a5298;
         }
 
-        .parent-div {
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .board {
             display: grid;
-            grid-template-columns: repeat(3, 100px);
-            grid-template-rows: repeat(3, 100px);
-            gap: 8px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
         }
 
-        .parent-div div {
-            background-color: white;
-            border-radius: 10px;
-            font-size: 40px;
-            font-weight: bold;
+        .hole {
+            background: radial-gradient(circle at center, #8b5a2b, #5a3825);
+            border-radius: 50%;
+            height: 90px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: inset 0 8px 12px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .hole:hover {
+            transform: scale(1.05);
+        }
+
+        .mole {
+            position: absolute;
+            bottom: -90px;
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-size: 35px;
+            transition: bottom 0.4s ease;
         }
 
-        .parent-div div:hover {
-            background-color: #f8f9fc;
-            transform: scale(1.05);
+        .hole.show .mole {
+            bottom: 0;
         }
 
         button {
             margin-top: 20px;
-            padding: 10px 20px;
+            padding: 12px 18px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
+            background: #2a5298;
+            color: white;
             font-size: 16px;
             cursor: pointer;
-            background-color: #fff;
-            font-weight: bold;
             transition: 0.3s;
         }
 
         button:hover {
-            background-color: #ddd;
+            background: #1e3c72;
+            transform: scale(1.05);
         }
     </style>
 </head>
 
 <body>
+    <div class="container">
+        <h1>Whack-a-Mole</h1>
 
-    <h1>🎮 Tic Tac Toe</h1>
+        <div class="top-bar">
+            <div>Score: <span id="score">0</span></div>
+            <div>Time: <span id="time">30</span>s</div>
+        </div>
 
-    <div class="parent-div">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
+        <div class="board" id="board"></div>
+
+        <button id="startBtn">Start Game</button>
     </div>
 
-    <button onclick="resetGame()">Reset Game</button>
+    <script>
+        const board = document.getElementById("board");
+        const scoreText = document.getElementById("score");
+        const timeText = document.getElementById("time");
+        const startBtn = document.getElementById("startBtn");
 
-    <script src="script.js"></script>
+        let score = 0;
+        let time = 30;  // Increased game time
+        let gameTimer;
+        let moleTimer;
 
+        for (let i = 0; i < 9; i++) {
+            const hole = document.createElement("div");
+            hole.className = "hole";
+
+            const mole = document.createElement("div");
+            mole.className = "mole";
+            mole.textContent = "🐹";
+
+            hole.appendChild(mole);
+            board.appendChild(hole);
+
+            hole.onclick = function () {
+                if (hole.classList.contains("show")) {
+                    score++;
+                    scoreText.textContent = score;
+                    hole.classList.remove("show");
+                }
+            };
+        }
+
+        const holes = document.querySelectorAll(".hole");
+
+        function showRandomMole() {
+            holes.forEach(h => h.classList.remove("show"));
+
+            const randomIndex = Math.floor(Math.random() * holes.length);
+            holes[randomIndex].classList.add("show");
+        }
+
+        function startGame() {
+            score = 0;
+            time = 30;
+            scoreText.textContent = score;
+            timeText.textContent = time;
+
+            clearInterval(gameTimer);
+            clearInterval(moleTimer);
+
+            // SPEED REDUCED (700ms → 1200ms)
+            moleTimer = setInterval(showRandomMole, 1200);
+
+            gameTimer = setInterval(function () {
+                time--;
+                timeText.textContent = time;
+
+                if (time === 0) {
+                    clearInterval(gameTimer);
+                    clearInterval(moleTimer);
+                    alert("Game Over! Your Score: " + score);
+                }
+            }, 1000);
+        }
+
+        startBtn.onclick = startGame;
+    </script>
 </body>
 
 </html>
