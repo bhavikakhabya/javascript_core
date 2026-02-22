@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Favourite Item Toggle</title>
+
+    <style>
+        .favorite-icon {
+            font-size: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .filled {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <ul class="item-list">
+        <li>
+            FRIENDZONE
+            <button class="favorite-icon">&#9825;</button>
+        </li>
+        <li>
+            RELATIONSHIP
+            <button class="favorite-icon">&#9825;</button>
+        </li>
+        <li>
+            BREAK-UP
+            <button class="favorite-icon">&#9825;</button>
+        </li>
+    </ul>
+
+    <script>
+        const buttons = document.querySelectorAll(".favorite-icon");
+
+        buttons.forEach(function(button) {
+            button.addEventListener("click", function() {
+
+                if (button.classList.contains("filled")) {
+                    button.classList.remove("filled");
+                    button.innerHTML = "&#9825;";
+                } else {
+                    button.classList.add("filled");
+                    button.innerHTML = "&#10084;";
+                }
+
+            });
+        });
+    </script>
+
+</body>
+</html>
