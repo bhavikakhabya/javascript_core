@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Weather App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            width: 320px;
+            transition: 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input {
+            width: 85%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
+        }
+
+        button {
+            padding: 10px 25px;
+            background: linear-gradient(to right, #007bff, #00c6ff);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        #result {
+            margin-top: 20px;
+            font-weight: 500;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Weather App 🌤</h2>
+        <input type="text" id="locationInput" placeholder="Enter city (e.g. Mumbai)">
+        <button onclick="getWeather()">Check Weather</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function getWeather() {
+            const location = document.getElementById('locationInput').value;
+            const resultDiv = document.getElementById('result');
+
+            if (!location) {
+                resultDiv.innerHTML = '<span class="error">Please enter a city name</span>';
+                return;
+            }
+
+            resultDiv.innerHTML = "Fetching...";
+
+            try {
+                const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${location}&count=1`);
+                const geoData = await geoRes.json();
+
+                if (!geoData.results || geoData.results.length === 0) {
+                    resultDiv.innerHTML = '<span class="error">Location not found</span>';
+                    return;
+                }
+
+                const latitude = geoData.results[0].latitude;
+                const longitude = geoData.results[0].longitude;
+                const name = geoData.results[0].name;
+
+                const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
+                const weatherData = await weatherRes.json();
+
+                const temp = weatherData.current_weather.temperature;
+                const wind = weatherData.current_weather.windspeed;
+
+                resultDiv.innerHTML = `
+                <div style="font-size: 1.2rem;">${name}</div>
+                <div style="font-size: 2rem; color: #007bff;">${temp}°C</div>
+                <div style="font-weight: normal; color: #666;">Wind: ${wind} km/h</div>
+            `;
+
+            } catch (error) {
+                resultDiv.innerHTML = '<span class="error">Failed to fetch data</span>';
+            }
+        }
+    </script>
+
+</body>
+
+</html>
